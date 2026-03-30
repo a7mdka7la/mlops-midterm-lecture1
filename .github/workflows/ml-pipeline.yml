@@ -1,42 +1,69 @@
-name: ML Model CI
+name: End-to-End ML Pipeline
 
 on:
   push:
-    branches: main
-  pull_request:
+    branches: [ main ]
 
 jobs:
-  validate-and-test:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 
-
+        uses: actions/checkout@v4
+        
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
+          
       - name: Install Dependencies
-        run: pip install -r requirements.txt
-
-      - name: Linter Check
-        run: |
-          pip install flake8
-          flake8 . --exit-zero
-
-      - name: Model Dry Test
-        run: |
-          python -c "import torch; print('Model environment ready!')"
-
-      - name: Upload project documentation
+        run: pip install -r requirements.txt mlflow dvc
+        
+      - name: Pull Data via DVC
+        # Assuming you have configured remote storage, DVC pulls the exact data version
+        run: dvc pull 
+        
+      - name: Train and Log to MLflow
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: python gan_script.py
+        
+      - name: Persist Run ID
         uses: actions/upload-artifact@v4
         with:
-          name: project-doc
-          path: README.md 
+          name: model-info
+          path: model_info.txt
 
-      - name: Upload environment
-        uses: actions/upload-artifact@v4
+  deploy:
+    needs: validate # Wait for validation to pass before deploying
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          name: environment
-          path: environment.yml 
+          python-version: '3.10'
+          
+      - name: Install Dependencies
+        run: pip install mlflow
+        
+      - name: Download Run ID Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: model-info
+          
+      - name: Enforce Performance Threshold
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: python validate_model.py
+        
+      - name: Containerize (Mock Build)
+        run: |
+          # Read the artifact file
+          MODEL_RUN_ID=$(cat model_info.txt)
+          echo "Building Docker image for Run ID: $MODEL_RUN_ID"
+          
+          # Pass the Run ID into the Dockerfile as a build argument
+          docker build --build-arg RUN_ID=$MODEL_RUN_ID -t my-ml-app:latest .
