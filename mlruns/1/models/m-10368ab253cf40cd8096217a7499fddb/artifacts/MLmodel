@@ -1,0 +1,24 @@
+artifact_path: /Users/ahmedkahla/Developer/4th year university/Term 2/MLOps/midterm
+  study /lecture 1 /mlruns/1/models/m-10368ab253cf40cd8096217a7499fddb/artifacts
+flavors:
+  python_function:
+    config:
+      device: null
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pytorch
+    pickle_module_name: mlflow.pytorch.pickle_module
+    python_version: 3.12.13
+  pytorch:
+    code: null
+    model_data: data
+    pytorch_version: 2.5.1
+mlflow_version: 3.10.1
+model_id: m-10368ab253cf40cd8096217a7499fddb
+model_size_bytes: 5468
+model_uuid: m-10368ab253cf40cd8096217a7499fddb
+prompts: null
+run_id: f77e3453a9d14b789976b4b72988c3a1
+utc_time_created: '2026-03-30 10:54:48.654136'

@@ -1,0 +1,15 @@
+channels:
+- conda-forge
+dependencies:
+- python=3.12.13
+- pip<=26.0.1
+- pip:
+  - mlflow==3.10.1
+  - cloudpickle==3.1.2
+  - numpy==2.4.3
+  - packaging==25.0
+  - pandas==2.3.3
+  - pyyaml==6.0.3
+  - torch==2.5.1
+  - typing-extensions==4.15.0
+name: mlflow-env

@@ -1,0 +1,9 @@
+joblib @ file:///Users/ec2-user/croot/joblib_1767868074826/work
+numpy @ file:///Users/ec2-user/croot/numpy_and_numpy_base_1773996237704/work/dist/numpy-2.4.3-cp311-cp311-macosx_12_0_arm64.whl#sha256=57bbb70a0322a4b29b5cde87c8aebc7ba5f3562d78750685cc2207d91acc4b76
+packaging @ file:///opt/miniconda3/conda-bld/packaging_1761049079066/work
+pandas @ file:///Users/ec2-user/croot/pandas_1773246071761/work
+python-dateutil @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_66ud1l42_h/croot/python-dateutil_1716495741162/work
+scikit-learn @ file:///Users/ec2-user/croot/scikit-learn_1766097961875/work
+scipy @ file:///Users/ec2-user/croot/scipy_1773254227980/work/dist/scipy-1.17.1-cp311-cp311-macosx_12_0_arm64.whl#sha256=00d9d9b6daee4fa35c503ce38a1b7213f67c8286383b1dc001873029c1b5be25
+six @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_03myqm7p6o/croot/six_1744271511946/work
+threadpoolctl @ file:///opt/miniconda3/conda-bld/threadpoolctl_1764361580622/work
