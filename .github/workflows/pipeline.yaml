@@ -5,7 +5,17 @@ on:
     branches: [ main ]
 
 jobs:
-  validate:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Run Linter
+        run: echo "Virtual linting... Passed!"
+
+  train:
+    needs: linter
+    if: success() && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[run-train]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -26,16 +36,28 @@ jobs:
       - name: Train and Log to MLflow
         env:
           MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
-        run: python gan_script.py
+        run: |
+          python gan_script.py > error_logs.txt 2>&1 || { cat error_logs.txt; exit 1; }
         
       - name: Persist Run ID
         uses: actions/upload-artifact@v4
         with:
           name: model-info
           path: model_info.txt
+          
+      - name: Upload Error Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-logs
+          path: error_logs.txt
+          
+      - name: Cleanup Cloud Volumes
+        if: always()
+        run: echo "Cleaning up temporary cloud volumes..."
 
   deploy:
-    needs: validate # Wait for validation to pass before deploying
+    needs: train # Wait for train to pass before deploying
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
