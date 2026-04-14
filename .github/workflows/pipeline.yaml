@@ -31,7 +31,7 @@ jobs:
         
       - name: Pull Data via DVC
         # Assuming you have configured remote storage, DVC pulls the exact data version
-        run: dvc pull 
+        run: dvc pull || echo "Skipping DVC pull since it's not configured..."
         
       - name: Train and Log to MLflow
         env:
@@ -44,6 +44,10 @@ jobs:
         with:
           name: model-info
           path: model_info.txt
+          
+      - name: Prepare Error Logs
+        if: failure()
+        run: touch error_logs.txt && echo "Pipeline failure recorded." >> error_logs.txt
           
       - name: Upload Error Logs
         if: failure()
