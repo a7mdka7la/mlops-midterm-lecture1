@@ -34,16 +34,20 @@ jobs:
         run: dvc pull || echo "Skipping DVC pull since it's not configured..."
         
       - name: Train and Log to MLflow
-        env:
-          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
         run: |
-          python gan_script.py > error_logs.txt 2>&1 || { cat error_logs.txt; exit 1; }
+          python gan_script.py > error_logs.txt 2>&1
+          if [ $? -ne 0 ]; then
+            cat error_logs.txt
+            exit 1
+          fi
         
-      - name: Persist Run ID
+      - name: Persist Run ID and DB
         uses: actions/upload-artifact@v4
         with:
           name: model-info
-          path: model_info.txt
+          path: |
+            model_info.txt
+            mlflow.db
           
       - name: Prepare Error Logs
         if: failure()
@@ -81,8 +85,6 @@ jobs:
           name: model-info
           
       - name: Enforce Performance Threshold
-        env:
-          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
         run: python validate_model.py
         
       - name: Containerize (Mock Build)
@@ -92,4 +94,4 @@ jobs:
           echo "Building Docker image for Run ID: $MODEL_RUN_ID"
           
           # Pass the Run ID into the Dockerfile as a build argument
-          docker build --build-arg RUN_ID=$MODEL_RUN_ID -t my-ml-app:latest .
+          docker build -f DockerFile --build-arg RUN_ID="$MODEL_RUN_ID" -t my-ml-app:latest .
